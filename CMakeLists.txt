@@ -23,7 +23,7 @@ project(Tintinnabulator VERSION 0.0.1)
 
 # find_package(JUCE CONFIG REQUIRED)        # If you've installed JUCE to your system
 # or
-add_subdirectory(JUCE)                    # If you've put JUCE in a subdirectory called JUCE
+add_subdirectory(lib/JUCE)                    # If you've put JUCE in a subdirectory called JUCE
 
 # If you are building a VST2 or AAX plugin, CMake needs to be told where to find these SDKs on your
 # system. This setup should be done before calling `juce_add_plugin`.
@@ -61,16 +61,20 @@ juce_add_plugin(Tintinnabulator
 # probably don't need to call this.
 
 # juce_generate_juce_header(AudioPluginExample)
+include_directories("include")
 
 # `target_sources` adds source files to a target. We pass the target that needs the sources as the
 # first argument, then a visibility parameter for the sources which should normally be PRIVATE.
 # Finally, we supply a list of source files that will be built into the target. This is a standard
 # CMake command.
 
+
 target_sources(Tintinnabulator
         PRIVATE
-        PluginEditor.cpp
-        PluginProcessor.cpp)
+        src/PluginEditor.cpp
+        src/PluginProcessor.cpp
+        src/Tintinnabulator.cpp
+)
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use

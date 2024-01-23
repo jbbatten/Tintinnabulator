@@ -18,9 +18,9 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(AudioPluginAudi
     firstPositionSuperiorButton.addListener(this);
     secondPositionSuperiorButton.addListener(this);
 
-    notePickerOne.addItemList(notes, 0);
-    notePickerTwo.addItemList(notes, 0);
-    notePickerThree.addItemList(notes, 0);
+    notePickerOne.addItemList(notes, 1);
+    notePickerTwo.addItemList(notes, 1);
+    notePickerThree.addItemList(notes, 1);
 
     // SET TO A
     notePickerOne.setSelectedId(1);
@@ -72,19 +72,13 @@ void AudioPluginAudioProcessorEditor::resized() {
 
 void AudioPluginAudioProcessorEditor::comboBoxChanged(juce::ComboBox *comboBoxThatHasChanged) {
     if (comboBoxThatHasChanged == &notePickerOne) {
-        int selectedItemId = notePickerOne.getSelectedId();
-        processorRef.noteOne = notePickerOne.getItemText(selectedItemId);
-        DBG(processorRef.noteOne);
+        processorRef.noteOne = notePickerOne.getText();
     }
     if (comboBoxThatHasChanged == &notePickerTwo) {
-        int selectedItemId = notePickerTwo.getSelectedId();
-        processorRef.noteTwo = notePickerTwo.getItemText(selectedItemId);
-        DBG(processorRef.noteTwo);
+        processorRef.noteTwo = notePickerTwo.getText();
     }
     if (comboBoxThatHasChanged == &notePickerThree) {
-        int selectedItemId = notePickerThree.getSelectedId();
-        processorRef.noteThree = notePickerThree.getItemText(selectedItemId);
-        DBG(processorRef.noteThree);
+        processorRef.noteThree = notePickerThree.getText();
     }
 }
 

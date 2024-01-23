@@ -6,14 +6,16 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
         : AudioProcessor(BusesProperties()
 #if !JucePlugin_IsMidiEffect
 #if !JucePlugin_IsSynth
-                                 .withInput("Input", juce::AudioChannelSet::stereo(), true)
+        .withInput("Input", juce::AudioChannelSet::stereo(), true)
 #endif
-                                 .withOutput("Output", juce::AudioChannelSet::stereo(), true)
+        .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
 ) {
+    tintinnabulator = new Tintinnabulator();
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
+    delete (tintinnabulator);
 }
 
 //==============================================================================
@@ -85,7 +87,7 @@ void AudioPluginAudioProcessor::releaseResources() {
 
 bool AudioPluginAudioProcessor::isBusesLayoutSupported(const BusesLayout &layouts) const {
 #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
+    juce::ignoreUnused(layouts);
     return true;
 #else
     // This is the place where you check if the layout is supported.
@@ -178,47 +180,19 @@ void AudioPluginAudioProcessor::processMidiBuffer(juce::AudioBuffer<float> &buff
         // Check for Note On event
         if (msg.isNoteOn()) {
 
-            // ADD A MAJOR THIRD
-            int midiNote = msg.getNoteNumber() + 4; // Harmonizing with original note
-            float velocity = 0.6f; // Set desired velocity for harmony note
+            processedMidi.addEvent(tintinnabulator->GenerateTVoice(msg), sampleNumber);
 
-            // Create the note on message and add it to the processed MIDI buffer
-            juce::MidiMessage noteOn = juce::MidiMessage::noteOn(midiChannel, midiNote, velocity);
-            processedMidi.addEvent(noteOn, sampleNumber);
-
-            // ADD A FIFTH
-            midiNote = msg.getNoteNumber() + 7; // Harmonizing with original note
-            velocity = 0.6f;
-
-            // Create the note on message and add it to the processed MIDI buffer
-            noteOn = juce::MidiMessage::noteOn(midiChannel, midiNote, velocity);
-            processedMidi.addEvent(noteOn, sampleNumber);
         }
             // Check for Note Off event or Note On with zero velocity
         else if (msg.isNoteOff() || (msg.isNoteOn() && msg.getVelocity() == 0)) {
 
-            // REMOVE MAJOR THIRD
-            int midiNote = msg.getNoteNumber() + 4; // Corresponding harmonized note
+            processedMidi.addEvent(tintinnabulator->RemoveTVoice(msg), sampleNumber);
 
-            // Create the note off message and add it to the processed MIDI buffer
-            juce::MidiMessage noteOff = juce::MidiMessage::noteOff(midiChannel, midiNote);
-            processedMidi.addEvent(noteOff, sampleNumber);
-
-            // REMOVE FIFTH
-            midiNote = msg.getNoteNumber() + 7; // Corresponding harmonized note
-
-            // Create the note off message and add it to the processed MIDI buffer
-            noteOff = juce::MidiMessage::noteOff(midiChannel, midiNote);
-            processedMidi.addEvent(noteOff, sampleNumber);
         }
     }
 
     // Merge the processed MIDI messages with the incoming MIDI messages
     midiBuffer.addEvents(processedMidi, 0, buffer.getNumSamples(), 0);
-}
-
-void AudioPluginAudioProcessor::handleComboBoxChange(int selectedItemId) {
-
 }
 
 //==============================================================================
